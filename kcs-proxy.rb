@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# coding:  utf-8
 
 require 'pp'
 
@@ -15,7 +16,11 @@ kcs_handler = Proc.new{|req,res|
 
 		
 		Thread.fork(res.body) {|body|
-			p JSON.parse(body.gsub(/svdata=/,''))
+			File.open("kcs-dump.log","a",0644){ |f|
+				f.flock(File::LOCK_EX)
+				f.write JSON.parse(body.gsub(/svdata=/,'')).pretty_inspect
+			}
+
 		}
 
 	end
