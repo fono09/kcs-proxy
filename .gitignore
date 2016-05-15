@@ -37,4 +37,4 @@ build/
 ## for kcp-proxy files
 kcs.log
 kcs-dump.log
-
+*.log

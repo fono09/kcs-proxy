@@ -63,10 +63,13 @@ end
 
 kcs_handler = Proc.new do |req,res|
 
-	if req.unparsed_uri.include?("kcsapi") then
-		
-		Thread.fork(res.body,req.unparsed_uri) do |body,uri|
-			
+	fork do
+	
+		uri = req.unparsed_uri
+		body = res.body
+
+		if uri.include?("kcsapi") then
+
 			kcs_addr = uri.gsub(/.*?kcsapi\/(.*?)/,'\1')
 			kcs_data = JSON.parse(body.gsub(/svdata=/,''))
 
@@ -106,9 +109,10 @@ kcs_handler = Proc.new do |req,res|
 
 			api_start2_api_mst_ship.csv
 
-			buffer = kcs_addr << "\n" << kcs_data.pretty_inspect
+			buffer = "==========\n" << kcs_data.pretty_inspect << "==========\n"
 
-			File.open("kcs-dump.log", "a", 0644) do |f|
+			kcs_file = kcs_addr.gsub(/\//,'_')
+			File.open("kcs-dump-pp-#{kcs_file}.log", "a", 0644) do |f|
 
 					f.flock(File::LOCK_EX)
 					f.write(buffer)
